@@ -1,0 +1,116 @@
+local Players = game:GetService("Players")
+local TextChatService = game:GetService("TextChatService")
+
+-- Création de l'interface
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "HlxAp_Gui"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+
+-- Fenêtre principale
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 200, 0, 300)
+mainFrame.Position = UDim2.new(0.5, -100, 0.5, -150)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+mainFrame.BorderSizePixel = 2
+mainFrame.BorderColor3 = Color3.fromRGB(200, 0, 0)
+mainFrame.Active = true
+mainFrame.Draggable = true -- Déplaçable à la souris
+mainFrame.Parent = screenGui
+
+-- Titre "Hlx Ap"
+local title = Instance.new("TextLabel")
+title.Name = "Title"
+title.Text = "Hlx Ap"
+title.Size = UDim2.new(1, -40, 0, 40)
+title.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Font = Enum.Font.SourceSansBold
+title.TextSize = 22
+title.Parent = mainFrame
+
+-- Bouton Réduire / Agrandir
+local reduceBtn = Instance.new("TextButton")
+reduceBtn.Name = "ReduceBtn"
+reduceBtn.Text = "_"
+reduceBtn.Size = UDim2.new(0, 40, 0, 40)
+reduceBtn.Position = UDim2.new(1, -40, 0, 0)
+reduceBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+reduceBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+reduceBtn.Font = Enum.Font.SourceSansBold
+reduceBtn.TextSize = 25
+reduceBtn.Parent = mainFrame
+
+-- Zone de défilement (Scroll)
+local scrollingFrame = Instance.new("ScrollingFrame")
+scrollingFrame.Name = "PlayerList"
+scrollingFrame.Size = UDim2.new(1, -10, 1, -50)
+scrollingFrame.Position = UDim2.new(0, 5, 0, 45)
+scrollingFrame.BackgroundTransparency = 1
+scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+scrollingFrame.ScrollBarThickness = 6
+scrollingFrame.Parent = mainFrame
+
+local layout = Instance.new("UIListLayout")
+layout.Padding = UDim.new(0, 5)
+layout.Parent = scrollingFrame
+
+-- Variable pour savoir si c'est réduit
+local isReduced = false
+
+reduceBtn.MouseButton1Click:Connect(function()
+	if isReduced then
+		-- On agrandit
+		mainFrame:TweenSize(UDim2.new(0, 200, 0, 300), "Out", "Quart", 0.3, true)
+		scrollingFrame.Visible = true
+		reduceBtn.Text = "_"
+		isReduced = false
+	else
+		-- On réduit
+		mainFrame:TweenSize(UDim2.new(0, 200, 0, 40), "Out", "Quart", 0.3, true)
+		scrollingFrame.Visible = false
+		reduceBtn.Text = "+"
+		isReduced = true
+	end
+end)
+
+-- Fonction pour envoyer les commandes avec délai 0.8s
+local function runCommands(targetPlayer)
+	local commandes = {";jumpscare ", ";morph ", ";tiny ", ";rocket ", ";jail ", ";ragdoll ", ";inverse "}
+	for _, cmd in pairs(commandes) do
+		local messageFinal = cmd .. targetPlayer.Name
+		if TextChatService.ChatInputBarConfiguration.TargetTextChannel then
+			TextChatService.ChatInputBarConfiguration.TargetTextChannel:SendAsync(messageFinal)
+		else
+			local chatEvent = game:GetService("ReplicatedStorage"):FindFirstChild("DefaultChatSystemChatEvents")
+			if chatEvent then
+				chatEvent.SayMessageRequest:FireServer(messageFinal, "All")
+			end
+		end
+		task.wait(0.8)
+	end
+end
+
+-- Mise à jour automatique de la liste des joueurs
+local function updateList()
+	for _, child in pairs(scrollingFrame:GetChildren()) do
+		if child:IsA("TextButton") then child:Destroy() end
+	end
+	for _, player in pairs(Players:GetPlayers()) do
+		local btn = Instance.new("TextButton")
+		btn.Size = UDim2.new(1, -10, 0, 35)
+		btn.Text = "@" .. player.Name
+		btn.BackgroundColor3 = Color3.fromRGB(50, 0, 0)
+		btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+		btn.Font = Enum.Font.SourceSans
+		btn.TextSize = 16
+		btn.Parent = scrollingFrame
+		btn.MouseButton1Click:Connect(function() runCommands(player) end)
+	end
+	scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y)
+end
+
+Players.PlayerAdded:Connect(updateList)
+Players.PlayerRemoving:Connect(updateList)
+updateList()
