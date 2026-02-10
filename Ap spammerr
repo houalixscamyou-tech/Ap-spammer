@@ -16,7 +16,7 @@ mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 mainFrame.BorderSizePixel = 2
 mainFrame.BorderColor3 = Color3.fromRGB(200, 0, 0)
 mainFrame.Active = true
-mainFrame.Draggable = true -- Déplaçable à la souris
+mainFrame.Draggable = true 
 mainFrame.Parent = screenGui
 
 -- Titre "Hlx Ap"
@@ -61,13 +61,11 @@ local isReduced = false
 
 reduceBtn.MouseButton1Click:Connect(function()
 	if isReduced then
-		-- On agrandit
 		mainFrame:TweenSize(UDim2.new(0, 200, 0, 300), "Out", "Quart", 0.3, true)
 		scrollingFrame.Visible = true
 		reduceBtn.Text = "_"
 		isReduced = false
 	else
-		-- On réduit
 		mainFrame:TweenSize(UDim2.new(0, 200, 0, 40), "Out", "Quart", 0.3, true)
 		scrollingFrame.Visible = false
 		reduceBtn.Text = "+"
@@ -75,11 +73,12 @@ reduceBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
--- Fonction pour envoyer les commandes avec délai 0.8s
+-- Fonction pour envoyer les commandes avec délai ultra court
 local function runCommands(targetPlayer)
 	local commandes = {";jumpscare ", ";morph ", ";tiny ", ";rocket ", ";jail ", ";ragdoll ", ";inverse "}
 	for _, cmd in pairs(commandes) do
 		local messageFinal = cmd .. targetPlayer.Name
+		
 		if TextChatService.ChatInputBarConfiguration.TargetTextChannel then
 			TextChatService.ChatInputBarConfiguration.TargetTextChannel:SendAsync(messageFinal)
 		else
@@ -88,7 +87,7 @@ local function runCommands(targetPlayer)
 				chatEvent.SayMessageRequest:FireServer(messageFinal, "All")
 			end
 		end
-		task.wait(0.8)
+		task.wait() -- Délai le plus court possible pour éviter le crash ou le kick
 	end
 end
 
