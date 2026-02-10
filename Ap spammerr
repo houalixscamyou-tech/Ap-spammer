@@ -56,9 +56,8 @@ local layout = Instance.new("UIListLayout")
 layout.Padding = UDim.new(0, 5)
 layout.Parent = scrollingFrame
 
--- Variable pour savoir si c'est réduit
+-- Logique de réduction
 local isReduced = false
-
 reduceBtn.MouseButton1Click:Connect(function()
 	if isReduced then
 		mainFrame:TweenSize(UDim2.new(0, 200, 0, 300), "Out", "Quart", 0.3, true)
@@ -73,9 +72,19 @@ reduceBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
--- Fonction pour envoyer les commandes avec délai ultra court
+-- Fonction d'envoi des commandes
 local function runCommands(targetPlayer)
-	local commandes = {";jumpscare ", ";morph ", ";tiny ", ";rocket ", ";jail ", ";ragdoll ", ";inverse "}
+	local commandes = {
+		";jumpscare ", 
+		";morph ", 
+		";tiny ", 
+		";rocket ", 
+		";jail ", 
+		";ragdoll ", 
+		";inverse ",
+		";balloon " -- Correction orthographique ici
+	}
+	
 	for _, cmd in pairs(commandes) do
 		local messageFinal = cmd .. targetPlayer.Name
 		
@@ -87,11 +96,11 @@ local function runCommands(targetPlayer)
 				chatEvent.SayMessageRequest:FireServer(messageFinal, "All")
 			end
 		end
-		task.wait() -- Délai le plus court possible pour éviter le crash ou le kick
+		task.wait() -- Vitesse max
 	end
 end
 
--- Mise à jour automatique de la liste des joueurs
+-- Mise à jour de la liste des joueurs
 local function updateList()
 	for _, child in pairs(scrollingFrame:GetChildren()) do
 		if child:IsA("TextButton") then child:Destroy() end
